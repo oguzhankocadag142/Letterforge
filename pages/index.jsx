@@ -3,17 +3,9 @@ import { useState } from "react";
 const style = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --ink: #0f0e0d; --cream: #f5f0e8; --gold: #c9a84c;
-    --gold-light: #e8d5a3; --rust: #b5451b; --paper: #faf7f2;
-    --shadow: rgba(15,14,13,0.12);
-  }
+  :root { --ink: #0f0e0d; --cream: #f5f0e8; --gold: #c9a84c; --gold-light: #e8d5a3; --rust: #b5451b; --paper: #faf7f2; --shadow: rgba(15,14,13,0.12); }
   body { background: var(--cream); font-family: 'DM Sans', sans-serif; }
-  .app {
-    min-height: 100vh; background: var(--cream);
-    background-image: radial-gradient(ellipse at 20% 0%, rgba(201,168,76,0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(181,69,27,0.1) 0%, transparent 50%);
-  }
+  .app { min-height: 100vh; background: var(--cream); background-image: radial-gradient(ellipse at 20% 0%, rgba(201,168,76,0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(181,69,27,0.1) 0%, transparent 50%); }
   .header { padding: 32px 40px 0; display: flex; align-items: flex-start; justify-content: space-between; }
   .logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--ink); }
   .logo span { color: var(--gold); }
@@ -36,7 +28,7 @@ const style = `
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field.span2 { grid-column: span 2; }
   label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #7a746b; }
-  input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--ink); background: var(--cream); border: 1.5px solid #d4cfc7; border-radius: 3px; padding: 12px 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; resize: vertical; width: 100%; }
+  input, textarea { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--ink); background: var(--cream); border: 1.5px solid #d4cfc7; border-radius: 3px; padding: 12px 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; resize: vertical; width: 100%; }
   input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.12); }
   textarea { min-height: 110px; }
   .btn { display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; padding: 14px 28px; border: none; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
@@ -62,11 +54,8 @@ const style = `
   .loading-sub { font-size: 14px; color: #7a746b; }
   .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   .result-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--ink); }
-  .copy-btn { font-size: 12px; font-weight: 600; padding: 8px 16px; background: var(--ink); color: var(--gold); border: none; border-radius: 2px; cursor: pointer; transition: all 0.2s; }
-  .copy-btn:hover { background: #333; }
+  .copy-btn { font-size: 12px; font-weight: 600; padding: 8px 16px; background: var(--ink); color: var(--gold); border: none; border-radius: 2px; cursor: pointer; }
   .result-box { background: #fff; border: 1px solid #e0d9cf; border-radius: 3px; padding: 32px; font-size: 14px; line-height: 1.85; color: #2a2825; white-space: pre-wrap; max-height: 460px; overflow-y: auto; }
-  .result-box::-webkit-scrollbar { width: 6px; }
-  .result-box::-webkit-scrollbar-thumb { background: var(--gold-light); border-radius: 3px; }
   .score-bar { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 14px 16px; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.25); border-radius: 3px; }
   .score-text { font-size: 13px; color: #5a5650; flex: 1; }
   .score-num { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--gold); }
@@ -95,7 +84,10 @@ export default function Home() {
   const [step, setStep] = useState(0);
   const [docType, setDocType] = useState("cover_letter");
   const [tone, setTone] = useState("Professional");
-  const [form, setForm] = useState({ name:"", role:"", experience:"", skills:"", achievement:"", company:"", jobTitle:"", jobDesc:"", whyCompany:"" });
+  const [form, setForm] = useState({
+    name: "", role: "", experience: "", skills: "", achievement: "",
+    company: "", jobTitle: "", jobDesc: "", whyCompany: ""
+  });
   const [result, setResult] = useState("");
   const [score, setScore] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -118,33 +110,51 @@ Rules: Write only the final document. Be specific, never use placeholder text. R
 After the document add exactly this line: MATCH_SCORE: [number 1-100]`;
   };
 
-  const generate = async () => {
-    setLoading(true); setError(""); setResult(""); setScore(null);
+  const handleGenerate = async () => {
+    setLoading(true);
+    setError("");
+    setResult("");
+    setScore(null);
+
     try {
-      // Kendi API route'una gider — müşteri API key görmez
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: buildPrompt() }),
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed");
+
+      if (!res.ok) throw new Error(data.error || "Request failed");
+
       const text = data.text || "";
+      if (!text) throw new Error("Empty response from AI");
+
       const m = text.match(/MATCH_SCORE:\s*(\d+)/);
-      if (m) { setScore(parseInt(m[1])); setResult(text.replace(/\nMATCH_SCORE:\s*\d+\n?/, "").trim()); }
-      else setResult(text.trim());
+      if (m) {
+        setScore(parseInt(m[1]));
+        setResult(text.replace(/\nMATCH_SCORE:\s*\d+\n?/, "").trim());
+      } else {
+        setResult(text.trim());
+      }
       setStep(3);
     } catch (e) {
-      setError("Something went wrong. Please try again.");
+      setError(e.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const copy = () => { navigator.clipboard.writeText(result); setCopied(true); setTimeout(() => setCopied(false), 2000); };
-  const reset = () => { setStep(0); setResult(""); setScore(null); setError(""); };
+  const copy = () => {
+    navigator.clipboard.writeText(result);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-  const canStep1 = docType;
+  const reset = () => {
+    setStep(0); setResult(""); setScore(null); setError("");
+  };
+
   const canStep2 = form.name && form.role && form.experience && form.skills;
   const canGenerate = form.company && form.jobTitle;
 
@@ -155,7 +165,7 @@ After the document add exactly this line: MATCH_SCORE: [number 1-100]`;
         <div className="header">
           <div>
             <div className="logo">Letter<span>Forge</span></div>
-            <div style={{fontSize:11,color:"#9a9488",marginTop:2,fontWeight:300}}>AI Career Documents</div>
+            <div style={{ fontSize: 11, color: "#9a9488", marginTop: 2, fontWeight: 300 }}>AI Career Documents</div>
           </div>
           <div className="badge">AI Powered</div>
         </div>
@@ -178,13 +188,12 @@ After the document add exactly this line: MATCH_SCORE: [number 1-100]`;
 
         <div className="card">
 
-          {/* STEP 0 — Doc type */}
           {step === 0 && (
             <>
               <div className="section-label">Step 1 — Choose document type</div>
               <div className="doc-types">
                 {DOC_TYPES.map(d => (
-                  <div key={d.id} className={`doc-type ${docType===d.id?"selected":""}`} onClick={() => setDocType(d.id)}>
+                  <div key={d.id} className={`doc-type ${docType === d.id ? "selected" : ""}`} onClick={() => setDocType(d.id)}>
                     <div className="doc-type-icon">{d.icon}</div>
                     <div className="doc-type-name">{d.name}</div>
                     <div className="doc-type-desc">{d.desc}</div>
@@ -192,10 +201,10 @@ After the document add exactly this line: MATCH_SCORE: [number 1-100]`;
                 ))}
               </div>
               <div>
-                <label style={{display:"block",marginBottom:10,fontSize:11,fontWeight:600,letterSpacing:1,textTransform:"uppercase",color:"#7a746b"}}>Writing Tone</label>
-                <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                <label style={{ display: "block", marginBottom: 10, fontSize: 11, fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", color: "#7a746b" }}>Writing Tone</label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                   {TONES.map(t => (
-                    <button key={t} onClick={() => setTone(t)} style={{padding:"7px 14px",border:`1.5px solid ${tone===t?"var(--gold)":"#d4cfc7"}`,borderRadius:2,background:tone===t?"rgba(201,168,76,0.1)":"transparent",cursor:"pointer",fontSize:13,fontWeight:500,color:tone===t?"var(--ink)":"#7a746b",fontFamily:"'DM Sans',sans-serif",transition:"all 0.2s"}}>
+                    <button key={t} onClick={() => setTone(t)} style={{ padding: "7px 14px", border: `1.5px solid ${tone === t ? "var(--gold)" : "#d4cfc7"}`, borderRadius: 2, background: tone === t ? "rgba(201,168,76,0.1)" : "transparent", cursor: "pointer", fontSize: 13, fontWeight: 500, color: tone === t ? "var(--ink)" : "#7a746b", fontFamily: "'DM Sans',sans-serif", transition: "all 0.2s" }}>
                       {t}
                     </button>
                   ))}
@@ -208,16 +217,15 @@ After the document add exactly this line: MATCH_SCORE: [number 1-100]`;
             </>
           )}
 
-          {/* STEP 1 — Your info */}
           {step === 1 && (
             <>
               <div className="section-label">Step 2 — About you</div>
               <div className="form-grid">
-                <div className="field"><label>Full Name *</label><input placeholder="e.g. Alex Johnson" value={form.name} onChange={e=>update("name",e.target.value)} /></div>
-                <div className="field"><label>Target Role *</label><input placeholder="e.g. Senior Product Manager" value={form.role} onChange={e=>update("role",e.target.value)} /></div>
-                <div className="field"><label>Years of Experience *</label><input placeholder="e.g. 5 years" value={form.experience} onChange={e=>update("experience",e.target.value)} /></div>
-                <div className="field"><label>Top Skills *</label><input placeholder="e.g. React, Node.js, AWS" value={form.skills} onChange={e=>update("skills",e.target.value)} /></div>
-                <div className="field span2"><label>Best Achievement (optional)</label><textarea placeholder="e.g. Grew revenue by 40% in 12 months through a new pricing strategy." value={form.achievement} onChange={e=>update("achievement",e.target.value)} style={{minHeight:80}} /></div>
+                <div className="field"><label>Full Name *</label><input placeholder="e.g. Alex Johnson" value={form.name} onChange={e => update("name", e.target.value)} /></div>
+                <div className="field"><label>Target Role *</label><input placeholder="e.g. Senior Product Manager" value={form.role} onChange={e => update("role", e.target.value)} /></div>
+                <div className="field"><label>Years of Experience *</label><input placeholder="e.g. 5 years" value={form.experience} onChange={e => update("experience", e.target.value)} /></div>
+                <div className="field"><label>Top Skills *</label><input placeholder="e.g. React, Node.js, AWS" value={form.skills} onChange={e => update("skills", e.target.value)} /></div>
+                <div className="field span2"><label>Best Achievement (optional)</label><textarea placeholder="e.g. Grew revenue by 40% in 12 months..." value={form.achievement} onChange={e => update("achievement", e.target.value)} style={{ minHeight: 80 }} /></div>
               </div>
               <div className="actions">
                 <button className="btn btn-ghost" onClick={() => setStep(0)}>← Back</button>
@@ -226,26 +234,24 @@ After the document add exactly this line: MATCH_SCORE: [number 1-100]`;
             </>
           )}
 
-          {/* STEP 2 — Job details */}
           {step === 2 && !loading && (
             <>
               <div className="section-label">Step 3 — Job details</div>
-              <div className="tip-row"><span>💡</span> More detail = more tailored result. Paste the actual job description for best results.</div>
+              <div className="tip-row"><span>💡</span> Paste the actual job description for best results.</div>
               <div className="form-grid">
-                <div className="field"><label>Company Name *</label><input placeholder="e.g. Stripe" value={form.company} onChange={e=>update("company",e.target.value)} /></div>
-                <div className="field"><label>Job Title *</label><input placeholder="e.g. Backend Engineer" value={form.jobTitle} onChange={e=>update("jobTitle",e.target.value)} /></div>
-                <div className="field span2"><label>Job Description</label><textarea placeholder="Paste key responsibilities and requirements here..." value={form.jobDesc} onChange={e=>update("jobDesc",e.target.value)} /></div>
-                <div className="field span2"><label>Why this company?</label><input placeholder="e.g. I admire their developer-first approach..." value={form.whyCompany} onChange={e=>update("whyCompany",e.target.value)} /></div>
+                <div className="field"><label>Company Name *</label><input placeholder="e.g. Stripe" value={form.company} onChange={e => update("company", e.target.value)} /></div>
+                <div className="field"><label>Job Title *</label><input placeholder="e.g. Backend Engineer" value={form.jobTitle} onChange={e => update("jobTitle", e.target.value)} /></div>
+                <div className="field span2"><label>Job Description</label><textarea placeholder="Paste key responsibilities and requirements here..." value={form.jobDesc} onChange={e => update("jobDesc", e.target.value)} /></div>
+                <div className="field span2"><label>Why this company?</label><input placeholder="e.g. I admire their developer-first approach..." value={form.whyCompany} onChange={e => update("whyCompany", e.target.value)} /></div>
               </div>
               {error && <div className="error-box">⚠️ {error}</div>}
               <div className="actions">
                 <button className="btn btn-ghost" onClick={() => setStep(1)}>← Back</button>
-                <button className="btn btn-primary" onClick={generate} disabled={!canGenerate}>✨ Generate</button>
+                <button className="btn btn-primary" onClick={handleGenerate} disabled={!canGenerate}>✨ Generate</button>
               </div>
             </>
           )}
 
-          {/* Loading */}
           {loading && (
             <div className="loading-state">
               <div className="spinner" />
@@ -254,11 +260,10 @@ After the document add exactly this line: MATCH_SCORE: [number 1-100]`;
             </div>
           )}
 
-          {/* STEP 3 — Result */}
           {step === 3 && result && (
             <>
               <div className="result-header">
-                <div className="result-title">{DOC_TYPES.find(d=>d.id===docType)?.icon} Your {DOC_TYPES.find(d=>d.id===docType)?.name}</div>
+                <div className="result-title">{DOC_TYPES.find(d => d.id === docType)?.icon} Your {DOC_TYPES.find(d => d.id === docType)?.name}</div>
                 <button className="copy-btn" onClick={copy}>{copied ? "✓ Copied!" : "Copy"}</button>
               </div>
               <div className="result-box">{result}</div>
